@@ -1,0 +1,79 @@
+<html>
+  <head>
+    <link href='https://fonts.googleapis.com/css?family=Lato' rel='stylesheet' type='text/css'>
+    <style type="text/css">
+      body{
+        width:300px;
+        font-family: Lato, sans-serif
+      }
+      h1{
+        color: #361039;
+        padding: 5px 0px;
+        margin-bottom: 10px;
+      }
+      #input{
+        width :100%;
+        height:160px;
+        font-size: 1.2em;
+        padding:5px;
+        outline: none;
+      }
+      #editor{
+        display: none;
+      }
+      #error{
+        display: none;
+        font-size: 1.2em;
+        color:#E04664;
+      }
+      .bookmark-item{
+        font-size:1.2em;
+        background-color: #53B992;
+        display: inline-block;
+        padding:5px 10px;
+        border-radius: 5px;
+        cursor: default;
+        color: #fff;
+        margin-bottom:5px;
+      }
+      .del{
+        padding-left:15px;
+        color:#c3c3c3;
+      }
+      .del:hover{
+        color:#666;
+      }
+      #bookmark{
+        background-color:#53B992;
+        display: none;
+        padding:5px 10px;
+        border-radius: 0px;
+        cursor: default;
+        margin-bottom:5px;
+        color:#fff;
+        font-size:0.8em;
+      }
+      #set{
+        background-color:#E7A82E;
+        display: block;
+        padding:5px 10px;
+        cursor: default;
+        margin:5px auto;
+        color:#fff;
+        text-align: center;
+        font-size:1.2em;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>/remind</h1>
+    <div id="bookmark-list"></div>
+    <a id="bookmark">+ bookmark</a>
+    <div id="error">Sorry, could not set following reminders...</div>
+    <div id="editor">
+      <textarea type="text" name="input" id="input"></textarea>
+      <a id="set">set reminder</a>
+    </div>
+  </body>
+  <script type="text/javascript" src="popup.js"></script>
+</html>
