@@ -4,7 +4,7 @@ var url = ''
 var command = ''
 var reminders = []
 var failedRequests = []
-var setEl = document.getElementById('set')
+var sendEl = document.getElementById('send')
 var bookmarkEl = document.getElementById('bookmark')
 var bookmarkListEl = document.getElementById('bookmark-list')
 var inputEl = document.getElementById('input')
@@ -89,8 +89,8 @@ function appendBookmark (url) {
   bookmarkListEl.appendChild(div)
 }
 
-// Functions to set reminders
-function setReminder () {
+// Functions to send messages
+function setMessage () {
   command = commandEl.innerText.trim()
   inputEl.value = reminders.join('\n')
   injectToSlack(command, reminders.shift())
@@ -104,11 +104,21 @@ function clearTextarea () {
   failedRequests = []
 }
 
+function escapeHtml (text) {
+  return text.replace(/[\"&'\/<>]/g, function (a) {
+    return {
+      '"': '&quot;', '&': '&amp;', "'": '&#39;',
+      '/': '&#47;',  '<': '&lt;',  '>': '&gt;'
+    }[a]
+  })
+}
+
 function injectToSlack (command, msg) {
+  msg = escapeHtml(msg)
   var code = `
     var input = document.getElementById('message-input')
-    var inputVal = '${command} ${msg}'
-    input.value = inputVal
+    var inputVal = "${command} ${msg}"
+    input.value = inputVal.replace(/&quot;/g, '"').replace(/&amp;/g, '&').replace(/&#39;/g, "'").replace(/&#47;/g, '/').replace(/&lt;/g, '<').replace(/&gt;/g, '>')
     var submitScript = document.createElement('script')
     submitScript.textContent = 'TS.view.submit()'
     document.head.appendChild(submitScript)
@@ -116,10 +126,10 @@ function injectToSlack (command, msg) {
       var spans = document.getElementById('msgs_div').lastElementChild.lastElementChild.childNodes
       for (var i = 0; i < spans.length; i++) {
         if (spans[i].className === 'message_body') {
-          if (spans[i].innerText.startsWith(':thumbsup: I will remind you')) {
-            chrome.extension.sendRequest({ type: 'set_reminder', state: true, data: '${msg}' })
-          } else {
+          if (spans[i].innerText.startsWith("Sorry, I didn't quite get that")) {
             chrome.extension.sendRequest({ type: 'set_reminder', state: false, data: '${msg}' })
+          } else {
+            chrome.extension.sendRequest({ type: 'set_reminder', state: true, data: '${msg}' })
           }
           break
         }
@@ -128,7 +138,7 @@ function injectToSlack (command, msg) {
   `
 
   if (msg === '') {
-    setReminder()
+    setMessage()
   } else {
     chrome.tabs.executeScript({
       code: code
@@ -145,7 +155,7 @@ chrome.extension.onRequest.addListener(function (msg) {
       failedRequests.push(msg.data)
     }
     if (reminders.length > 0) {
-      setReminder()
+      setMessage()
     } else {
       clearTextarea()
     }
@@ -166,12 +176,12 @@ helpDocEl.addEventListener('click', function () {
   chrome.tabs.create({url: 'https://github.com/kosamari/remind/blob/master/README.md'})
 })
 
-// Set reminders btn
-setEl.addEventListener('click', function () {
+// send btn
+sendEl.addEventListener('click', function () {
   errorEl.style.display = 'none'
   if(input.value){
     reminders = inputEl.value.split('\n')
-    setReminder()
+    setMessage()
   }
 })
 
