@@ -1,8 +1,8 @@
 {
-  "name": "Slack Batch Remind",
+  "name": "/remind for Slack",
   "version": "1.0",
   "manifest_version": 2,
-  "description": "Set Slack reminder in batch",
+  "description": "Send /command to slack in batches",
 
   "browser_action":{
     "default_popup": "popup.html",

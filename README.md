@@ -1,4 +1,4 @@
-Slack Batch Remind
+/remind for Slack
 ==============
 
 Chrome Extension to set Slack reminders in batch.

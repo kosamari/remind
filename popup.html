@@ -6,10 +6,16 @@
         width:300px;
         font-family: Lato, sans-serif
       }
-      h1{
+      #command{
         color: #361039;
         padding: 5px 0px;
         margin-bottom: 10px;
+        outline: none;
+        overflow: scroll;
+        width:100%;
+      }
+      #command:hover{
+        background-color: #fcfcfc;
       }
       #input{
         width :100%;
@@ -47,7 +53,6 @@
         background-color:#53B992;
         display: none;
         padding:5px 10px;
-        border-radius: 0px;
         cursor: default;
         margin-bottom:5px;
         color:#fff;
@@ -63,10 +68,23 @@
         text-align: center;
         font-size:1.2em;
       }
+      #help{
+        font-size:1.1em;
+        display: none;
+      }
+      #help-doc{
+        display: inline-block;
+        background-color: #6ECADE;
+        padding:2px 5px;
+        border-radius: 3px;
+        color:#fff;
+        cursor: default;
+      }
     </style>
   </head>
   <body>
-    <h1>/remind</h1>
+    <h1 id="command" contenteditable="false">/remind</h1>
+    <div id="help">Send Slack command in batch! Check out <span id="help-doc">help doc</span></div>
     <div id="bookmark-list"></div>
     <a id="bookmark">+ bookmark</a>
     <div id="error">Sorry, could not set following reminders...</div>

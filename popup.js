@@ -1,6 +1,7 @@
 'use strict'
 
 var url = ''
+var command = ''
 var reminders = []
 var failedRequests = []
 var setEl = document.getElementById('set')
@@ -9,6 +10,9 @@ var bookmarkListEl = document.getElementById('bookmark-list')
 var inputEl = document.getElementById('input')
 var editorEl = document.getElementById('editor')
 var errorEl = document.getElementById('error')
+var commandEl = document.getElementById('command')
+var helpDocEl = document.getElementById('help-doc')
+var helpEl = document.getElementById('help')
 
 function init () {
   // create bookmark list in popup
@@ -20,14 +24,23 @@ function init () {
   // check if the active tab is slack page
   chrome.tabs.query({ 'active': true, 'lastFocusedWindow': true }, function (tabs) {
     url = tabs[0].url
-    if (url.indexOf('.slack.com/messages/') > -1) {
+    if (isSlackPage()) {
       // it is a slack page! show the input UI.
       editorEl.style.display = 'block'
       // if url is not part of bookmark, also show bookmark button
       updateBookmarkBtn()
       return
+    } else if (bookmarks.length === 0){
+      helpEl.style.display = 'inline-block'
     }
   })
+}
+
+function isSlackPage () {
+  if (url.indexOf('.slack.com/messages/') > -1) {
+    return true
+  }
+  return false
 }
 
 // Bookmarks
@@ -37,7 +50,7 @@ function getBookmarks () {
 
 function updateBookmarkBtn () {
   var bookmarks = getBookmarks()
-  if (bookmarks.indexOf(url) === -1) {
+  if (isSlackPage() && bookmarks.indexOf(url) === -1) {
     bookmarkEl.style.display = 'inline-block'
   } else {
     bookmarkEl.style.display = 'none'
@@ -78,8 +91,9 @@ function appendBookmark (url) {
 
 // Functions to set reminders
 function setReminder () {
+  command = commandEl.innerText.trim()
   inputEl.value = reminders.join('\n')
-  injectToSlack(reminders.shift())
+  injectToSlack(command, reminders.shift())
 }
 
 function clearTextarea () {
@@ -90,10 +104,10 @@ function clearTextarea () {
   failedRequests = []
 }
 
-function injectToSlack (msg) {
+function injectToSlack (command, msg) {
   var code = `
     var input = document.getElementById('message-input')
-    var inputVal = '/remind ${msg}'
+    var inputVal = '${command} ${msg}'
     input.value = inputVal
     var submitScript = document.createElement('script')
     submitScript.textContent = 'TS.view.submit()'
@@ -126,7 +140,7 @@ function injectToSlack (msg) {
 // This is event called from injectToSlack()
 chrome.extension.onRequest.addListener(function (msg) {
   if (msg.type === 'set_reminder') {
-    if (!msg.state) {
+    if (command.indexOf('/remind') === 0 && !msg.state) {
       // failed to set reminder on slack
       failedRequests.push(msg.data)
     }
@@ -136,6 +150,20 @@ chrome.extension.onRequest.addListener(function (msg) {
       clearTextarea()
     }
   }
+})
+
+// Command
+commandEl.addEventListener('click', function () {
+  commandEl.contentEditable = 'true'
+  commandEl.focus()
+})
+commandEl.addEventListener('blur', function () {
+  commandEl.contentEditable = 'false'
+})
+
+// Help
+helpDocEl.addEventListener('click', function () {
+  chrome.tabs.create({url: 'https://github.com/kosamari/remind/blob/master/README.md'})
 })
 
 // Set reminders btn
