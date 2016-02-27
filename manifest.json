@@ -2,7 +2,7 @@
   "name": "/remind for Slack",
   "version": "1.0",
   "manifest_version": 2,
-  "description": "Send /command to slack in batches",
+  "description": "Send /command messages to slack in batch",
 
   "browser_action":{
     "default_popup": "popup.html",
